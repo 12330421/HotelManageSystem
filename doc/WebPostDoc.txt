@@ -1,0 +1,447 @@
+﻿#这些所有的接口都应该以http post方式调用
+#post body应为一个json字符串，不能为空
+#服务器也会返回一个json字符串
+
+#_id 为当前域内对应实体的id，所有id是数据库自动生成，不可修改，不可指定
+#所有_id数据类型为字符串
+#登录成功后，服务器会在客户端浏览器设置cookie(包括id和用户名)
+#后续所有前台操作从cookie中获取customer_id、customer_name
+
+#2015/6/6 修改: 1. 所有_id数据类型改为为字符串，文档中没有双引号的_id请自行加上
+#                      2. 所有输入(input)不能为空，如果没有参数，输入为{}
+#                      3. mealBooking去掉total_price项
+#                      4. room加入了room_state项
+#                      5. 完善了/backend/cleanReport/addItem接口
+#                      6. 增加上传文件接口
+
+#上传文件
+#post 上传文件到该url,服务器返回文件的url路径
+#例: /resources/upload/1433528710_88.png
+/upload
+
+#登录(User)
+/forend/loginPost:
+input : {"username" : "test", "password" : "test"}
+output : {"excute_result" : true, "is_exist" : true}
+
+#注册
+/forend/registerPost:
+input : {"username" : "test", "realname" : "test", "password" : "test", 
+            "phone" : "13824418551",  "email" : "791215023@qq.com", 
+            "identity_id" : "440881xxxxxxxxxxx"}
+output : {"excute_result" : true}
+
+#登出
+/forend/logoutPost:
+input : {}
+output : {"excute_result" : true}
+
+#-----------------2015-06-02更新------
+#登录（Admin）
+/backend/loginPost:
+input: {"username": "admin", "password": "password"}
+
+#登出（Admin）
+/backend/logoutPost:
+input: {}
+output:{"excute_result": true}
+#-----------------2015-06-02结束------
+
+#获取个人信息
+/forend/myCenter/getMyInformation:
+input : {}
+output : {"excute_result" : true, 
+              "item" : {"_id" : 123, "username" : "test", "realname" : "test", 
+                            "phone" : "13824418551", "email" : "791215023@qq.com",  
+                            "identity_id" : "4408811990100028882"}}
+
+#更新个人信息
+/forend/myCenter/updateMyInformation:
+input : {"update_set": {"username" : "test", "realname" : "test", 
+                                  "phone" : "13824418551", "email" : "791215023@qq.com",
+                                  "identity_id" : "4408811990100028882"}},
+output : {"excute_result" : true}
+
+#获取所有空闲房间列表(room_state  为 available)
+/forend/roomBooking/getOptionalList:
+input : {}
+output : {"excute_result" : true, 
+              "item_list" : [{"_id" : 123, "room_number" : "B402", "room_category_item" : {"_id" : 100, "room_category_name" : "", "rent" : 50, "display_image_path" : ""}}, 
+                                 {"_id" : 122, "room_number" : "B403", "room_category_item" : {"_id" : 101, "room_category_name" : "", "rent" : 50, "display_image_path" : ""}},
+                                 {"_id" : 121, "room_number" : "B401", "room_category_item" : {"_id" : 102, "room_category_name" : "", "rent" : 50, "display_image_path" : ""}}]}
+
+#获取房间分类之后的空闲房间
+/forend/roomBooking/getCategoryOptionalList:
+input : {"room_category_id": 100}
+output : {"excute_result" : true, 
+              "item_list" : [{"_id" : 123, "room_number" : "B402", "room_category_item" : {"_id" : 100, "room_category_name" : "", "rent" : 50, "display_image_path" : ""}}, 
+                                 {"_id" : 122, "room_number" : "B403", "room_category_item" : {"_id" : 101, "room_category_name" : "", "rent" : 50, "display_image_path" : ""}},
+                                 {"_id" : 121, "room_number" : "B401", "room_category_item" : {"_id" : 102, "room_category_name" : "", "rent" : 50, "display_image_path" : ""}}]}
+
+#获取用户的历史订房订单
+/forend/roomBooking/getBookingList:
+input : {}
+output : {"excute_result" : true, 
+              "item_list" : [{"_id" : 421, "room_item" : {"_id" : 123, "room_number" : "B401", "room_category_item" : {"_id" : 100, "room_category_name" : "", "rent" : 50}}, 
+                                  "datetime" : "2015-5-10 12:45:00", "duration" : ""}, 
+                                 {"_id" : 422, "room_item" : {"_id" : 122, "room_number" : "B402", "room_category_item" : {"_id" : 101, "room_category_name" : "", "rent" : 50}}, 
+                                  "datetime" : "2015-5-10 12:45:00", "duration" : ""},
+                                 {"_id" : 423, "room_item" : {"_id" : 121, "room_number" : "B403", "room_category_item" : {"_id" : 102, "room_category_name" : "", "rent" : 50}}, 
+                                  "datetime" : "2015-5-10 12:45:00", "duration" : ""}]}
+#获取单条订单信息                                
+/forend/roomBooking/getBooking:
+input : {"_id" : 123}
+output : {"excute_result" : true, 
+              "item" : {"_id" : 421, "room_item" : {"_id" : 123, "room_number" : "B401", "room_category_item" : {"_id" : 100, "room_category_name" : "", "rent" : 50, "display_image_path" : ""}}, 
+                            "datetime" : "2015-5-10 12:45:00", "duration" : ""}}
+
+#房间预订下单
+/forend/roomBooking/makeBooking:
+input : {"room_id" : 123, "datetime" : "2015-5-10 12:45:00", "duration" : ""}
+output : {"excute_result" : true}
+
+
+#修改房间预订
+/forend/roomBooking/updateBooking:
+input : {"_id" : 123, 
+            "update_set" : {"room_id" : "422", "datetime" : "2015-5-10 12:45:00", "duration" : ""}}
+output : {"excute_result" : true}
+
+#取消订房
+/forend/roomBooking/cancelBooking:
+input : {"_id" : "123"}
+output : {"excute_result" : true}
+
+#获取可选菜式列表
+/forend/mealBooking/getOptionalList:
+input : {}
+output : {"excute_result" : true, 
+              "item_list" : [{"_id":"123", "dish_category_name" : "", "display_image_path" : "", "price" : 100, "description" : ""}, 
+                                 {"_id":"122", "dish_category_name" : "", "display_image_path" : "", "price" : 53, "description" : ""},
+                                 {"_id":"121", "dish_category_name" : "", "display_image_path" : "", "price" : 29, "description" : ""}]}
+#获取用户的所有订餐订单
+/forend/mealBooking/getBookingList:
+input : {}
+output : {"excute_result" : true, 
+              "item_list" : [ {"_id" : 421, 
+                                   "dish_category_item_list" : [
+                                    {"_id" : 123, "dish_category_name" : "", "price" : 100}, 
+                                    {"_id" : 123, "dish_category_name" : "", "price" : 50}], 
+                                    "dish_count_list" : [1, 1], 
+                                    "datetime" : "2015-5-10 12:45:00", 
+                                    "booking_state" : "succeed"}, 
+
+                                {"_id" : 422, 
+                                   "dish_category_item_list" : [
+                                    {"_id" : 122, "dish_category_name" : "", "price" : 100}, 
+                                    {"_id" : 123, "dish_category_name" : "", "price" : 50}], 
+                                   "dish_count_list" : [1, 1], 
+                                   "datetime" : "2015-5-10 12:45:00", 
+                                   "booking_state" : "succeed"},
+
+                               {"_id" : 423, 
+                                 `"dish_category_item_list" : [{"_id" : 121, "dish_category_name" : "", "price" : 100}, 
+                                                                            {"_id" : 123, "dish_category_name" : "", "price" : 50}], 
+                                   "dish_count_list" : [1, 1], "datetime" : "2015-5-10 12:45:00", "booking_state" : "succeed"}]}
+#获取单条订餐订单信息                               
+/forend/mealBooking/getBooking:
+input : {"_id" : 123}
+output : {"excute_result" : true, 
+              "item" : {"_id" : 421, 
+                            "dish_category_item_list" :  [{"_id" : 123, "dish_category_name" : "", "price" : 100}, 
+                                                                      {"_id" : 123, "dish_category_name" : "", "price" : 50}], 
+                            "dish_count_list" : [1, 1], "datetime" : "2015-5-10 12:45:00", "booking_state" : "succeed"}}
+#订餐下单
+#菜式id数组和对应的数量数组是一一对应的:dish_category_id_list[0]的数量是dish_count_list[0]
+/forend/mealBooking/makeBooking:
+input : {"dish_category_id_list" : ["123", "122"], "dish_count_list":[1,2], "datetime" : "2015-5-10 12:45:00", "booking_state" : "succeed"}
+output : {"excute_result" : true}
+
+
+#更新订单              
+/forend/mealBooking/updateBooking:
+input : {"_id" : 123, 
+            "update_set" : {"dish_category_id_list" : ["233", "222"],                  
+                                   "dish_count_list" : [1, 1], "datetime" : "2015-5-10 12:45:00", "booking_state" : "succeed"}}
+output : {"excute_result" : true}
+
+#删除订餐订单
+/forend/mealBooking/cancelBooking:
+input : {"_id" : 123}
+output : {"excute_result" : true}
+
+#获取顾客列表
+/backend/customer/getAllItems:
+input : {}
+output : {"excute_result" : true, 
+              "item_list" : [{"_id" : 421, "username" : "test", "realname" : "test",
+                                   "phone" : "13824418551", "email" : "791215023@qq.com"， "identity_id" : "440881xxxxxxxxxxx"}, 
+                                 {"_id" : 422, "username" : "test", "realname" : "test",
+                                   "phone" : "13824418551", "email" : "791215023@qq.com"， "identity_id" : "440881xxxxxxxxxxx"},
+                                 {"_id" : 423, "username" : "test", "realname" : "test", 
+                                   "phone" : "13824418551", "email" : "791215023@qq.com"， "identity_id" : "440881xxxxxxxxxxx"}]}
+
+#获取单个顾客信息
+/backend/customer/getOneItem:
+input : {"_id" : 422}
+output : {"excute_result" : true, 
+              "item" : {"username" : "test", "realname" : "test", 
+                            "phone" : "13824418551", "email" : "791215023@qq.com"， "identity_id" : "440881xxxxxxxxxxx"}}
+
+#分派清洁任务
+#task_state的值应该“派遣”、”接受“、”执行“、”结束“之一
+/backend/cleanTask/addItem:
+input : {"employee_id" : 321, "room_id" : 123, "task_state" : "", "clean_report" : "", "date-time":"2015-05-31 12:00"}
+output : {"excute_result" : true}
+
+#获取所有的反馈报告
+/backend/cleanTask/getAllItems:
+input : {}
+output : {"excute_result" : true, 
+              "item_list" : [{"_id" : 421, "employee_item" : {"_id" : 111, "name" : ""}, 
+                                   "room_item" : {"_id" : 111, "room_number" : "", "room_category_item" : {"_id" : 111, "room_category_name" : ""}},
+                                   "task_state" : "", "clean_report" : "", "date-time":"2015-05-31 12:00"}, 
+                                 {"_id" : 421, "employee_item" : {"_id" : 111, "name" : ""}, 
+                                   "room_item" : {"_id" : 111, "room_number" : "", "room_category_item" : {"_id" : 111, "room_category_name" : ""}},
+                                   "task_state" : "", "clean_report" : "", "date-time":"2015-05-31 12:00"}, 
+                                 {"_id" : 421, ""employee_item" : {"_id" : 111, "name" : ""}, 
+                                   "room_item" : {"_id" : 111, "room_number" : "", "room_category_item" : {"_id" : 111, "room_category_name" : ""}},
+                                   "task_state" : "", "clean_report" : "", "date-time":"2015-05-31 12:00"}]}
+
+#获取单条反馈报告
+/backend/cleanTask/getOneItem:
+input : {"_id" : 421}
+output : {"excute_result" : true, 
+              "item" : {"_id" : 421, "employee_item" : {"_id" : 111, "name" : ""}, 
+                            "room_item" : {"_id" : 111, "room_number" : "", "room_category_item" : {"_id" : 111, "room_category_name" : ""}},
+                            "task_state" : "", "clean_report" : "", "date-time":"2015-05-31 12:00"}}
+#更新反馈报告                            
+/backend/cleanTask/updateItem:
+input : {"_id" : 123, 
+            "update_set" : {"employee_id" : "", "room_id" : 123, "task_state" : "", "clean_report" : ""}}
+output : {"excute_result" : true}
+
+#删除报告
+/backend/cleanTask/delteItem:
+input : {"_id" : 123}
+output : {"excute_result" : true}
+
+#增加菜式
+/backend/dishCategory/addItem:
+input : {"dish_category_name" : "A", "display_image_path" : "", 
+            "price" : 10000, "description" : "provided in summer only"}
+output : {"excute_result" : true}
+
+#获取所有菜式信息
+/backend/dishCategory/getAllItems:
+input : {}
+output : {"excute_result" : true, 
+              "item_list" : [{"_id" : 001, "dish_category_name" : "A", "display_image_path" : "", "price" : 10000, "description" : "provided in summer only"}, 
+                                 {"_id" : 001, "dish_category_name" : "B", "display_image_path" : "", "price" : 10000, "description" : "provided in autumn only"},
+                                 {"_id" : 001, "dish_category_name" : "C", "display_image_path" : "", "price" : 10000, "description" : "provided in winter only"}]}
+
+#获取一个菜式信息
+/backend/dishCategory/getOneItem:
+input : {"_id" : 001}
+output : {"excute_result" : true, 
+              "item" : {"_id" : 001, "dish_category_name" : "A", "display_image_path" : "", 
+                            "price" : 10000, "description : "provided in summer only"}}
+
+#更新菜式信息
+/backend/dishCategory/updateItem:
+input : {"_id" : 001, 
+            "update_set" : {"dish_category_name" : "A", "display_image_path" : "", 
+                                   "price" : 5000, "description" : "provided in summer only"}}
+output : {"excute_result" : true}
+
+#删除菜式信息
+/backend/dishCategory/deleteItem:
+input : {"_id" : 001}
+output : {"excute_result" : true}
+
+#新增一条员工信息
+/backend/employee/addItem:
+input : {"name" : "test", "gender" : "男", "birthplace" : "北京", 
+            "phone" : "13824418551", "birthdate" : "1992-07-01", "joindate":"2015-11-11", "position":"经理"}
+output : {"excute_result" : true}
+
+#获取员工信息
+/backend/employee/getAllItems:
+input : {}
+output : {"excute_result" : true, 
+              "item_list" : [{"_id" : 421, "name" : "test", "gender" : "男", "birthplace" : "北京", "phone" : "13824418551",
+                                   "birthdate" : "1992-07-01", "joindate":"2015-11-11", "position":"经理"}, 
+                                 {"_id" : 422, "name" : "test", "gender" : "男", "birthplace" : "北京", "phone" : "13824418551",
+                                  "birthdate" : "1992-07-01", "joindate":"2015-11-11", "position":"经理"},
+                                 {"_id" : 423, "name" : "test", "gender" : "男", "birthplace" : "北京", "phone" : "13824418551", 
+                                  "birthdate" : "1992-07-01", "joindate":"2015-11-11", "position":"经理"}]}
+#获取一条员工信息
+/backend/employee/getOneItem:
+input : {"_id" : 422}
+output : {"excute_result" : true, 
+              "item" : {"_id" : 422, "name" : "test", "gender" : "男", "birthplace" : "北京", "phone" : "13824418551",
+                            "birthdate" : "1992-07-01", "joindate":"2015-11-11", "position":"经理"}}
+
+#更新员工信息
+/backend/employee/updateItem:
+input : {"_id" : 422, 
+            "update_set" : {"name" : "test", "gender" : "男", "birthplace" : "北京", "phone" : "13824418551",
+                                   "birthdate" : "1992-07-01", "joindate":"2015-11-11", "position":"经理"}}
+output : {"excute_result" : true}
+
+#删除员工信息
+/backend/employee/deleteItem:
+input : {"_id" : 422}
+output : {"excute_result" : true}
+
+#---------------------2015-06-02更新---------------------
+
+#获取订餐订单(此处想加个房间号、数量)
+/backend/mealBooking/getAllItems:
+input : {}
+output : {"excute_result" : true, 
+              "item_list" : [{"_id" : 422, 
+                                   "dish_category_item_list" : [{"_id" : 123, "dish_category_name" : "", "price" : 100},  {"_id" : 123, "dish_category_name" : "", "price" : 50}], 
+                                   "dish_count_list" : [1, 1], "datetime" : "2015-5-10 12:45:00",
+                                   "customer_item" : {"_id": 123, "username":"test"}, 
+                                   "booking_state" : "succeed"}, 
+                                 {"_id" : 422, 
+                                  "dish_category_item_list" : [{"_id" : 123, "dish_category_name" : "", "price" : 100}, {"_id" : 123, "dish_category_name" : "", "price" : 50}], 
+                                  "dish_count_list" : [1, 1], "datetime" : "2015-5-10 12:45:00",
+                                   "customer_item" : {"_id": 123, "username":"test"}, 
+                                   "booking_state" : "succeed"},
+                                 {"_id" : 422, 
+                                  "dish_category_item_list" : [{"_id" : 123, "dish_category_name" : "", "price" : 100}, {"_id" : 123, "dish_category_name" : "", "price" : 50}], 
+                                   "total_price" : "250", "dish_count_list" : [1, 1], "datetime" : "2015-5-10 12:45:00",
+                                   "customer_item" : {"_id": 123, "username":"test"}, 
+                                   "booking_state" : "succeed"}]}
+
+#更新订单
+/backend/mealBooking/updateItem:
+input : {"_id" : 123, 
+            "update_set" : {"dish_category_item_list" : [{"_id" : 123, "dish_category_name" : "", "price" : 100}, 
+                                                                            {"_id" : 123, "dish_category_name" : "", "price" : 50}],                  
+                                   "dish_count_list" : [1, 1], "datetime" : "2015-5-10 12:45:00"
+                                   "customer_item" : {"_id": 123, "username":"test"}, 
+                                   "booking_state" : "done"}}
+output : {"excute_result" : true}
+
+#------------------------2015-06-02结束--------------
+#获取单条订餐订单
+/backend/mealBooking/getOneItem:
+input : {"_id" : 422}
+output : {"excute_result" : true, 
+              "item" : {"_id" : "422", 
+                            "dish_category_item_list" : [{"_id" : 123, "dish_category_name" : "", "price" : 100}, {"_id" : 123, "dish_category_name" : "", "price" : 50}], 
+                            "total_price" : "250", "dish_count_list" : [1, 1], "datetime" : "2015-5-10 12:45:00",
+                            "customer_item" : {"_id": 123, "username":"test"}, 
+                            "booking_state" : "succeed"}}
+
+#删除订单
+/backend/mealBooking/delteItem:
+input : {"_id" : 123}
+output : {"excute_result" : true}
+
+#增加房间
+/backend/room/addItem:
+input : {"room_number" : "A101", "room_category_id" : 001, 
+            "room_state" : "available", "description" : "new"}
+output : {"excute_result" : true}
+
+#获取房间列表
+/backend/room/getAllItems:
+input : {}
+output : {"excute_result" : true, 
+              "item_list" : [{"_id" : "001", "room_number" : "A101", 
+                                   "room_category_item" : {"_id" : 100, "room_category_name" : "double room"}, 
+                                   "room_state" : "available", "description" : "new"}, 
+                                 {"_id" : "001", "room_number" : "A101", 
+                                   "room_category_item" : {"_id" : 100, "room_category_name" : "double room"}, 
+                                   "room_state" : "available", "description" : "new"}, 
+                                 {"_id" : "001", "room_number" : "A101", 
+                                   "room_category_item" : {"_id" : 100, "room_category_name" : "double room"}, 
+                                   "room_state" : "available", "description" : "new"}]}
+
+#获取单个房间信息
+/backend/room/getOneItem:
+input : {"_id" : 001}
+output : {"excute_result" : true, 
+              "item" : {"_id" : "001", "room_number" : "A101",
+                            "room_category_item" : {"_id" : 100, "room_category_name" : "double room"}, 
+                            "room_state" : "available", "description" : "new"}}
+
+#更新单个房间信息
+/backend/room/updateItem:
+input : {"_id" : 001, 
+            "update_set" : {"room_number" : "A101", "room_category_id" : "001", 
+                                   "room_state" : "available", "description" : "new"}}
+output : {"excute_result" : true}
+
+
+#删除房间
+/backend/room/deleteItem:
+input : {"_id" : 422}
+output : {"excute_result" : true}
+
+#获取所有的房间订单
+/backend/roomBooking/getAllItems:
+input : {}
+output : {"excute_result" : true, 
+              "item_list" : [{"_id" : 422, 
+                                  "room_item" : {"_id" : 111, "room_number" : "", "room_category_item" : {"_id" : 111, "room_category_name" : ""}}, 
+                                  "customer_item" : {"_id" : 123, "username" : "test"}, 
+                                  "booking_state" : "succeed"}, 
+                                 {"_id" : 422, 
+                                  "room_item" : {"_id" : 111, "room_number" : "", "room_category_item" : {"_id" : 111, "room_category_name" : ""}}, 
+                                  "customer_item" : {"_id" : 123, "username" : "test"}, 
+                                  "booking_state" : "succeed"},
+                                 {"_id" : 422, 
+                                  "room_item" : {"_id" : 111, "room_number" : "", "room_category_item" : {"_id" : 111, "room_category_name" : ""}}, 
+                                  "customer_item" : {"_id" : 123, "username" : "test"}, 
+                                  "booking_state" : "succeed"}]}
+
+#获取一个订房订单
+/backend/roomBooking/getOneItem:
+input : {"_id" : 422}
+output : {"excute_result" : true, 
+              "item" : {"_id" : 422, 
+                            "room_item" : {"_id" : 111, "room_number" : "", "room_category_item" : {"_id" : 111, "room_category_name" : ""}}, 
+                            "customer_item" : {"_id" : 123, "username" : "test"}, 
+                            "booking_state" : "succeed"}}
+
+#删除订房订单
+/backend/roomBooking/delteItem:
+input : {"_id" : 123}
+output : {"excute_result" : true}
+
+#增加房间分类
+/backend/roomCategory/addItem:
+input : {"room_category_name" : "double room", "display_image_path" : "", 
+            "rent" : 10000, "description" : "new"}
+output : {"excute_result" : true}
+
+#获取所有房间分类
+/backend/roomCategory/getAllItems:
+input : {}
+output : {"excute_result" : true, 
+              "item_list" : [{"_id" : 001, "room_category_name" : "double room", "display_image_path" : "", "rent" : 10000, "description" : "new"}, 
+                                 {"_id" : 001, "room_category_name" : "double room", "display_image_path" : "", "rent" : 10000, "description" : "new"},
+                                 {"_id" : 001, "room_category_name" : "double room", "display_image_path" : "", "rent" : 10000, "description" : "new"}]}
+#获取房间的一个分类
+/backend/roomCategory/getOneItem:
+input : {"_id" : 001}
+output : {"excute_result" : true, 
+              "item" : {"_id" : 001, "room_category_name" : "double room", 
+                            "display_image_path" : "", "rent" : 10000, "description" : "new"}}
+
+#更新房间分类信息
+/backend/roomCategory/updateItem:
+input : {"_id" : 001, 
+            "update_set" : {"room_category_name" : "double room", 
+                                   "display_image_path" : "", "rent" : 5000, "description" : "new"}}
+output : {"excute_result" : true}
+
+#删除房间分类
+/backend/roomCategory/deleteItem:
+input : {"_id" : 001}
+output : {"excute_result" : true}
